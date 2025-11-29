@@ -5,7 +5,7 @@
 // Set to 1 to enable verbose debugging, 0 to disable and reduce noise.
 
 // Enables detailed logs for every BLE device found and connection steps.
-#define VERBOSE_BLE_DEBUG 0
+#define VERBOSE_BLE_DEBUG 1
 
 // Enables logging for every volume change.
 #define VERBOSE_VOLUME_DEBUG 0

@@ -2,11 +2,17 @@
 #include "debug_config.h"
 #include <Arduino.h>
 #include <WiFi.h>
+
+// Attempt to reduce memory usage of the Audio library by shrinking DMA buffers
+// This is necessary because DMA buffers use internal RAM, not PSRAM.
+#define I2S_DMA_BUF_COUNT 4
+#define I2S_DMA_BUF_LEN 512
 #include <Audio.h>
 
-#define I2S_DOUT  D1   // MAX98357 DIN
-#define I2S_BCLK  D2   // MAX98357 BCLK
-#define I2S_LRC   D0   // MAX98357 LRC
+// XIAO_ESP32S3 pin definitions: D0=GPIO1, D1=GPIO2, D2=GPIO3
+#define I2S_DOUT  2   // MAX98357 DIN (D1)
+#define I2S_BCLK  3   // MAX98357 BCLK (D2)
+#define I2S_LRC   1   // MAX98357 LRC (D0)
 
 // --- WiFi & Radio Configuration ---
 const char* ssid     = "MokuMoku";
@@ -29,7 +35,7 @@ void audio_info(const char *info){
 void radio_setup() {
   // Initialize WiFi
   WiFi.mode(WIFI_STA);
-  WiFi.setSleep(false);
+  WiFi.setSleep(true);
   WiFi.begin(ssid, password);
 
   Serial.print("Connecting to WiFi");
@@ -61,7 +67,7 @@ void radio_loop() {
 }
 
 void radio_increase_volume() {
-  currentVolume = min(21, currentVolume + 1);
+  currentVolume = min(10, currentVolume + 1);
   audio.setVolume(currentVolume);
   #if VERBOSE_VOLUME_DEBUG
     Serial.print("*** Volume UP: ");
