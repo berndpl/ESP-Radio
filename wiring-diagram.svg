@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="monospace" font-size="12">
+  <style>
+    .label { font-size: 11px; fill: #333; }
+    .title { font-size: 16px; font-weight: bold; fill: #111; }
+    .pin { font-size: 9px; fill: #fff; }
+    .wire { stroke-width: 2.5; fill: none; stroke-linecap: round; }
+    .component-label { font-size: 13px; font-weight: bold; fill: #222; }
+    .note { font-size: 10px; fill: #666; font-style: italic; }
+  </style>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title">XIAO ESP32-S3 — Deutschlandfunk Radio — Wiring Diagram</text>
+
+  <!-- ===== XIAO ESP32-S3 ===== -->
+  <rect x="120" y="100" width="180" height="300" rx="10" fill="#2d3748" stroke="#1a202c" stroke-width="2"/>
+  <text x="210" y="90" text-anchor="middle" class="component-label">XIAO ESP32-S3</text>
+  <!-- USB-C port -->
+  <rect x="185" y="380" width="50" height="25" rx="5" fill="#718096" stroke="#4a5568"/>
+  <text x="210" y="396" text-anchor="middle" class="pin">USB-C</text>
+
+  <!-- Left side pins -->
+  <rect x="100" y="120" width="30" height="18" rx="3" fill="#e53e3e"/><text x="115" y="133" text-anchor="middle" class="pin">D0</text>
+  <rect x="100" y="150" width="30" height="18" rx="3" fill="#dd6b20"/><text x="115" y="163" text-anchor="middle" class="pin">D1</text>
+  <rect x="100" y="180" width="30" height="18" rx="3" fill="#d69e2e"/><text x="115" y="193" text-anchor="middle" class="pin">D2</text>
+  <rect x="100" y="210" width="30" height="18" rx="3" fill="#718096"/><text x="115" y="223" text-anchor="middle" class="pin">D3</text>
+  <rect x="100" y="240" width="30" height="18" rx="3" fill="#38a169"/><text x="115" y="253" text-anchor="middle" class="pin">D4</text>
+  <rect x="100" y="270" width="30" height="18" rx="3" fill="#3182ce"/><text x="115" y="283" text-anchor="middle" class="pin">D5</text>
+  <rect x="100" y="300" width="30" height="18" rx="3" fill="#718096"/><text x="115" y="313" text-anchor="middle" class="pin">D6</text>
+
+  <!-- Right side pins -->
+  <rect x="290" y="120" width="30" height="18" rx="3" fill="#e53e3e"/><text x="305" y="133" text-anchor="middle" class="pin">5V</text>
+  <rect x="290" y="150" width="30" height="18" rx="3" fill="#1a202c" stroke="#555"/><text x="305" y="163" text-anchor="middle" class="pin">GND</text>
+  <rect x="290" y="180" width="30" height="18" rx="3" fill="#805ad5"/><text x="305" y="193" text-anchor="middle" class="pin">3V3</text>
+  <rect x="290" y="210" width="30" height="18" rx="3" fill="#718096"/><text x="305" y="223" text-anchor="middle" class="pin">D10</text>
+  <rect x="290" y="240" width="30" height="18" rx="3" fill="#718096"/><text x="305" y="253" text-anchor="middle" class="pin">D9</text>
+  <rect x="290" y="270" width="30" height="18" rx="3" fill="#718096"/><text x="305" y="283" text-anchor="middle" class="pin">D8</text>
+  <rect x="290" y="300" width="30" height="18" rx="3" fill="#718096"/><text x="305" y="313" text-anchor="middle" class="pin">D7</text>
+
+  <!-- Pin GPIO labels -->
+  <text x="88" y="133" text-anchor="end" class="label">GPIO1</text>
+  <text x="88" y="163" text-anchor="end" class="label">GPIO2</text>
+  <text x="88" y="193" text-anchor="end" class="label">GPIO3</text>
+  <text x="88" y="253" text-anchor="end" class="label">GPIO5</text>
+  <text x="88" y="283" text-anchor="end" class="label">GPIO6</text>
+
+  <!-- ===== MAX98357A ===== -->
+  <rect x="550" y="100" width="160" height="200" rx="8" fill="#9b2c2c" stroke="#742a2a" stroke-width="2"/>
+  <text x="630" y="90" text-anchor="middle" class="component-label">MAX98357A</text>
+
+  <!-- MAX pins (left side) -->
+  <rect x="530" y="120" width="30" height="18" rx="3" fill="#e53e3e"/><text x="545" y="133" text-anchor="middle" class="pin">VIN</text>
+  <rect x="530" y="150" width="30" height="18" rx="3" fill="#1a202c" stroke="#555"/><text x="545" y="163" text-anchor="middle" class="pin">GND</text>
+  <rect x="530" y="180" width="30" height="18" rx="3" fill="#d69e2e"/><text x="545" y="193" text-anchor="middle" class="pin">BCLK</text>
+  <rect x="530" y="210" width="30" height="18" rx="3" fill="#e53e3e"/><text x="545" y="223" text-anchor="middle" class="pin">LRC</text>
+  <rect x="530" y="240" width="30" height="18" rx="3" fill="#dd6b20"/><text x="545" y="253" text-anchor="middle" class="pin">DIN</text>
+
+  <!-- MAX pins (right side - output) -->
+  <rect x="700" y="150" width="30" height="18" rx="3" fill="#2d3748"/><text x="715" y="163" text-anchor="middle" class="pin">OUT+</text>
+  <rect x="700" y="180" width="30" height="18" rx="3" fill="#2d3748"/><text x="715" y="193" text-anchor="middle" class="pin">OUT-</text>
+
+  <!-- ===== SPEAKER ===== -->
+  <ellipse cx="820" cy="200" rx="55" ry="55" fill="#edf2f7" stroke="#4a5568" stroke-width="2"/>
+  <ellipse cx="820" cy="200" rx="30" ry="30" fill="#cbd5e0" stroke="#718096" stroke-width="1"/>
+  <ellipse cx="820" cy="200" rx="8" ry="8" fill="#a0aec0"/>
+  <text x="820" y="270" text-anchor="middle" class="component-label">Speaker 8Ω</text>
+  <text x="820" y="285" text-anchor="middle" class="note">Dayton PC83-8</text>
+
+  <!-- ===== VOLUME SWITCHES ===== -->
+  <!-- Vol UP -->
+  <rect x="20" y="230" width="50" height="40" rx="4" fill="#48bb78" stroke="#276749" stroke-width="2"/>
+  <text x="45" y="255" text-anchor="middle" class="pin" font-size="10">Vol +</text>
+
+  <!-- Vol DOWN -->
+  <rect x="20" y="280" width="50" height="40" rx="4" fill="#4299e1" stroke="#2b6cb0" stroke-width="2"/>
+  <text x="45" y="305" text-anchor="middle" class="pin" font-size="10">Vol -</text>
+
+  <!-- ===== WIRES ===== -->
+
+  <!-- 5V → VIN (red) -->
+  <path d="M 320,129 L 430,129 L 430,129 L 530,129" class="wire" stroke="#e53e3e"/>
+  <text x="425" y="122" text-anchor="middle" class="note">5V power</text>
+
+  <!-- GND → GND (black/dark) -->
+  <path d="M 320,159 L 440,159 L 440,159 L 530,159" class="wire" stroke="#2d3748" stroke-dasharray="6,3"/>
+  <text x="425" y="175" text-anchor="middle" class="note">ground</text>
+
+  <!-- D2 → BCLK (yellow) -->
+  <path d="M 100,189 L 60,189 L 60,370 L 480,370 L 480,189 L 530,189" class="wire" stroke="#d69e2e"/>
+  <text x="480" y="382" text-anchor="middle" class="label" fill="#d69e2e">D2→BCLK</text>
+
+  <!-- D0 → LRC (red-orange) -->
+  <path d="M 100,129 L 50,129 L 50,380 L 470,380 L 470,219 L 530,219" class="wire" stroke="#e53e3e"/>
+  <text x="470" y="395" text-anchor="middle" class="label" fill="#e53e3e">D0→LRC</text>
+
+  <!-- D1 → DIN (orange) -->
+  <path d="M 100,159 L 40,159 L 40,390 L 460,390 L 460,249 L 530,249" class="wire" stroke="#dd6b20"/>
+  <text x="460" y="405" text-anchor="middle" class="label" fill="#dd6b20">D1→DIN</text>
+
+  <!-- MAX OUT+ → Speaker (dark) -->
+  <path d="M 730,159 L 770,159 L 770,180 L 790,180" class="wire" stroke="#2d3748"/>
+
+  <!-- MAX OUT- → Speaker (dark dashed) -->
+  <path d="M 730,189 L 770,189 L 770,215 L 790,215" class="wire" stroke="#718096" stroke-dasharray="4,3"/>
+
+  <!-- Vol UP → D4 -->
+  <path d="M 70,249 L 100,249" class="wire" stroke="#38a169"/>
+
+  <!-- Vol DOWN → D5 -->
+  <path d="M 70,289 L 100,279" class="wire" stroke="#3182ce"/>
+
+  <!-- Vol UP to GND (through breadboard) -->
+  <path d="M 45,270 L 45,340 L 305,340 L 305,168" class="wire" stroke="#2d3748" stroke-dasharray="4,3"/>
+  <text x="170" y="335" text-anchor="middle" class="note">switches → GND</text>
+
+  <!-- Vol DOWN to GND (through breadboard) -->
+  <path d="M 45,320 L 45,350 L 315,350 L 315,168" class="wire" stroke="#2d3748" stroke-dasharray="4,3"/>
+
+  <!-- ===== ON/OFF SWITCH ===== -->
+  <rect x="160" y="440" width="100" height="30" rx="5" fill="#ecc94b" stroke="#d69e2e" stroke-width="2"/>
+  <text x="210" y="460" text-anchor="middle" font-size="10" font-weight="bold">ON / OFF</text>
+  <text x="210" y="480" text-anchor="middle" class="note">toggle switch on USB 5V line</text>
+
+  <!-- USB → On/Off → XIAO -->
+  <path d="M 130,455 L 160,455" class="wire" stroke="#e53e3e"/>
+  <text x="120" y="460" text-anchor="end" class="label">USB 5V</text>
+  <path d="M 260,455 L 280,455 L 280,405 L 210,405" class="wire" stroke="#e53e3e"/>
+
+  <!-- ===== LEGEND ===== -->
+  <rect x="560" y="340" width="300" height="160" rx="6" fill="#f7fafc" stroke="#e2e8f0"/>
+  <text x="710" y="360" text-anchor="middle" class="component-label">Connection Summary</text>
+  <text x="575" y="380" class="label">XIAO D0 (GPIO1) ──→ MAX LRC</text>
+  <text x="575" y="396" class="label">XIAO D1 (GPIO2) ──→ MAX DIN</text>
+  <text x="575" y="412" class="label">XIAO D2 (GPIO3) ──→ MAX BCLK</text>
+  <text x="575" y="428" class="label">XIAO 5V         ──→ MAX VIN</text>
+  <text x="575" y="444" class="label">XIAO GND        ──→ MAX GND</text>
+  <text x="575" y="460" class="label">XIAO D4 (GPIO5) ──→ Vol+ → GND</text>
+  <text x="575" y="476" class="label">XIAO D5 (GPIO6) ──→ Vol- → GND</text>
+  <text x="575" y="492" class="label">MAX OUT+/OUT-    ──→ Speaker</text>
+</svg>

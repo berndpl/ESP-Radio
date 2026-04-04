@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deutschlandfunk Radio — Wiring Checker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; color: #f8fafc; }
+  .subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px; }
+  .layout { display: flex; gap: 24px; flex-wrap: wrap; }
+  .diagram { flex: 1; min-width: 500px; }
+  .sidebar { width: 320px; }
+
+  /* Diagram */
+  svg { width: 100%; height: auto; border-radius: 12px; background: #1e293b; }
+  .wire { cursor: pointer; transition: opacity 0.2s, stroke-width 0.2s; }
+  .wire:hover { stroke-width: 5 !important; }
+  .wire.dimmed { opacity: 0.12; }
+  .wire.active { stroke-width: 5 !important; opacity: 1 !important; }
+  .component { cursor: pointer; }
+  .component:hover rect, .component:hover ellipse { filter: brightness(1.2); }
+
+  /* Checklist */
+  .checklist { background: #1e293b; border-radius: 12px; padding: 16px; }
+  .checklist h2 { font-size: 1rem; margin-bottom: 12px; color: #f8fafc; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid #334155; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #334155; }
+  .check-item.highlighted { background: #1e3a5f; }
+  .check-item input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; accent-color: #22c55e; cursor: pointer; flex-shrink: 0; }
+  .check-item.checked .check-label { text-decoration: line-through; color: #64748b; }
+  .check-item .check-label { font-size: 0.9rem; line-height: 1.4; }
+  .check-item .check-detail { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+  .wire-color { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; margin-right: 4px; border: 1px solid rgba(255,255,255,0.2); }
+
+  /* Progress */
+  .progress { margin-top: 16px; padding: 12px; background: #0f172a; border-radius: 8px; text-align: center; }
+  .progress-bar { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .progress-fill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s; }
+  .progress-text { font-size: 0.85rem; color: #94a3b8; }
+  .all-done { color: #22c55e; font-weight: bold; }
+
+  /* Tooltip */
+  .tooltip { position: fixed; background: #f8fafc; color: #1e293b; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; pointer-events: none; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4); max-width: 220px; display: none; }
+
+  /* Legend */
+  .legend { margin-top: 16px; background: #1e293b; border-radius: 12px; padding: 16px; }
+  .legend h2 { font-size: 1rem; margin-bottom: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 0.8rem; color: #cbd5e0; }
+</style>
+</head>
+<body>
+
+<h1>Deutschlandfunk Radio — Interactive Wiring Checker</h1>
+<p class="subtitle">Click a wire or checklist item to highlight the connection. Tick off each wire as you verify it.</p>
+
+<div class="layout">
+
+<!-- ===== SVG DIAGRAM ===== -->
+<div class="diagram">
+<svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background grid -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="700" height="480" fill="url(#grid)"/>
+
+  <!-- ===== XIAO ESP32-S3 ===== -->
+  <g class="component" data-component="xiao">
+    <rect x="100" y="80" width="140" height="260" rx="8" fill="#2d3748" stroke="#4a5568" stroke-width="2"/>
+    <text x="170" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#f8fafc">XIAO ESP32-S3</text>
+    <!-- USB-C -->
+    <rect x="145" y="320" width="50" height="20" rx="4" fill="#64748b"/>
+    <text x="170" y="334" text-anchor="middle" font-size="8" fill="#fff">USB-C</text>
+
+    <!-- Left pins -->
+    <rect x="80" y="100" width="28" height="16" rx="3" fill="#ef4444" data-pin="D0"/><text x="94" y="112" text-anchor="middle" font-size="8" fill="#fff">D0</text>
+    <rect x="80" y="130" width="28" height="16" rx="3" fill="#f97316" data-pin="D1"/><text x="94" y="142" text-anchor="middle" font-size="8" fill="#fff">D1</text>
+    <rect x="80" y="160" width="28" height="16" rx="3" fill="#eab308" data-pin="D2"/><text x="94" y="172" text-anchor="middle" font-size="8" fill="#fff">D2</text>
+    <rect x="80" y="190" width="28" height="16" rx="3" fill="#64748b" data-pin="D3"/><text x="94" y="202" text-anchor="middle" font-size="8" fill="#fff">D3</text>
+    <rect x="80" y="220" width="28" height="16" rx="3" fill="#22c55e" data-pin="D4"/><text x="94" y="232" text-anchor="middle" font-size="8" fill="#fff">D4</text>
+    <rect x="80" y="250" width="28" height="16" rx="3" fill="#3b82f6" data-pin="D5"/><text x="94" y="262" text-anchor="middle" font-size="8" fill="#fff">D5</text>
+    <rect x="80" y="280" width="28" height="16" rx="3" fill="#64748b" data-pin="D6"/><text x="94" y="292" text-anchor="middle" font-size="8" fill="#fff">D6</text>
+
+    <!-- Right pins -->
+    <rect x="232" y="100" width="28" height="16" rx="3" fill="#ef4444" data-pin="5V"/><text x="246" y="112" text-anchor="middle" font-size="8" fill="#fff">5V</text>
+    <rect x="232" y="130" width="28" height="16" rx="3" fill="#1e293b" stroke="#64748b" data-pin="GND"/><text x="246" y="142" text-anchor="middle" font-size="8" fill="#fff">GND</text>
+    <rect x="232" y="160" width="28" height="16" rx="3" fill="#a855f7" data-pin="3V3"/><text x="246" y="172" text-anchor="middle" font-size="8" fill="#fff">3V3</text>
+
+    <!-- GPIO labels -->
+    <text x="74" y="112" text-anchor="end" font-size="8" fill="#94a3b8">GPIO1</text>
+    <text x="74" y="142" text-anchor="end" font-size="8" fill="#94a3b8">GPIO2</text>
+    <text x="74" y="172" text-anchor="end" font-size="8" fill="#94a3b8">GPIO3</text>
+    <text x="74" y="232" text-anchor="end" font-size="8" fill="#94a3b8">GPIO5</text>
+    <text x="74" y="262" text-anchor="end" font-size="8" fill="#94a3b8">GPIO6</text>
+  </g>
+
+  <!-- ===== MAX98357A ===== -->
+  <g class="component" data-component="max">
+    <rect x="420" y="80" width="130" height="200" rx="8" fill="#7f1d1d" stroke="#991b1b" stroke-width="2"/>
+    <text x="485" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#f8fafc">MAX98357A</text>
+
+    <!-- Left pins (input) -->
+    <rect x="400" y="100" width="28" height="16" rx="3" fill="#ef4444"/><text x="414" y="112" text-anchor="middle" font-size="8" fill="#fff">VIN</text>
+    <rect x="400" y="130" width="28" height="16" rx="3" fill="#1e293b" stroke="#64748b"/><text x="414" y="142" text-anchor="middle" font-size="8" fill="#fff">GND</text>
+    <rect x="400" y="160" width="28" height="16" rx="3" fill="#eab308"/><text x="414" y="172" text-anchor="middle" font-size="8" fill="#fff">BCLK</text>
+    <rect x="400" y="190" width="28" height="16" rx="3" fill="#ef4444"/><text x="414" y="202" text-anchor="middle" font-size="8" fill="#fff">LRC</text>
+    <rect x="400" y="220" width="28" height="16" rx="3" fill="#f97316"/><text x="414" y="232" text-anchor="middle" font-size="8" fill="#fff">DIN</text>
+
+    <!-- Right pins (output) -->
+    <rect x="542" y="130" width="28" height="16" rx="3" fill="#475569"/><text x="556" y="142" text-anchor="middle" font-size="8" fill="#fff">OUT+</text>
+    <rect x="542" y="160" width="28" height="16" rx="3" fill="#475569"/><text x="556" y="172" text-anchor="middle" font-size="8" fill="#fff">OUT-</text>
+  </g>
+
+  <!-- ===== SPEAKER ===== -->
+  <g class="component" data-component="speaker">
+    <ellipse cx="640" cy="170" rx="40" ry="40" fill="#334155" stroke="#64748b" stroke-width="2"/>
+    <ellipse cx="640" cy="170" rx="22" ry="22" fill="#475569"/>
+    <ellipse cx="640" cy="170" rx="6" ry="6" fill="#64748b"/>
+    <text x="640" y="225" text-anchor="middle" font-size="11" font-weight="bold" fill="#e2e8f0">Speaker</text>
+    <text x="640" y="238" text-anchor="middle" font-size="9" fill="#94a3b8">8 ohm</text>
+  </g>
+
+  <!-- ===== VOLUME SWITCHES ===== -->
+  <g class="component" data-component="volup">
+    <rect x="10" y="210" width="50" height="35" rx="5" fill="#166534" stroke="#22c55e" stroke-width="2"/>
+    <text x="35" y="232" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">Vol +</text>
+  </g>
+  <g class="component" data-component="voldown">
+    <rect x="10" y="255" width="50" height="35" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2"/>
+    <text x="35" y="277" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">Vol -</text>
+  </g>
+
+  <!-- ===== WIRES ===== -->
+  <!-- 1: 5V → VIN -->
+  <path class="wire" data-wire="5v" d="M 260,108 L 340,108 L 340,108 L 400,108" stroke="#ef4444" stroke-width="3" fill="none"/>
+  <text x="330" y="100" text-anchor="middle" font-size="8" fill="#ef4444" data-wire-label="5v">5V → VIN</text>
+
+  <!-- 2: GND → GND -->
+  <path class="wire" data-wire="gnd" d="M 260,138 L 340,138 L 340,138 L 400,138" stroke="#64748b" stroke-width="3" fill="none" stroke-dasharray="6,3"/>
+  <text x="330" y="152" text-anchor="middle" font-size="8" fill="#94a3b8" data-wire-label="gnd">GND → GND</text>
+
+  <!-- 3: D2 → BCLK -->
+  <path class="wire" data-wire="bclk" d="M 80,168 L 60,168 L 60,360 L 370,360 L 370,168 L 400,168" stroke="#eab308" stroke-width="3" fill="none"/>
+
+  <!-- 4: D0 → LRC -->
+  <path class="wire" data-wire="lrc" d="M 80,108 L 50,108 L 50,375 L 380,375 L 380,198 L 400,198" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="8,4"/>
+
+  <!-- 5: D1 → DIN -->
+  <path class="wire" data-wire="din" d="M 80,138 L 40,138 L 40,390 L 390,390 L 390,228 L 400,228" stroke="#f97316" stroke-width="3" fill="none"/>
+
+  <!-- 6: OUT+ → Speaker -->
+  <path class="wire" data-wire="spk_pos" d="M 570,138 L 600,138 L 600,155 L 615,155" stroke="#e2e8f0" stroke-width="3" fill="none"/>
+
+  <!-- 7: OUT- → Speaker -->
+  <path class="wire" data-wire="spk_neg" d="M 570,168 L 600,168 L 600,185 L 615,185" stroke="#94a3b8" stroke-width="3" fill="none" stroke-dasharray="6,3"/>
+
+  <!-- 8: Vol+ → D4 -->
+  <path class="wire" data-wire="vol_up" d="M 60,228 L 80,228" stroke="#22c55e" stroke-width="3" fill="none"/>
+
+  <!-- 9: Vol+ → GND -->
+  <path class="wire" data-wire="vol_up_gnd" d="M 35,245 L 35,310 L 246,310 L 246,146" stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="4,3"/>
+
+  <!-- 10: Vol- → D5 -->
+  <path class="wire" data-wire="vol_down" d="M 60,268 L 80,258" stroke="#3b82f6" stroke-width="3" fill="none"/>
+
+  <!-- 11: Vol- → GND -->
+  <path class="wire" data-wire="vol_down_gnd" d="M 35,290 L 35,320 L 252,320 L 252,146" stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="4,3"/>
+
+  <!-- Connection dots -->
+  <circle cx="260" cy="108" r="4" fill="#ef4444"/>
+  <circle cx="400" cy="108" r="4" fill="#ef4444"/>
+  <circle cx="260" cy="138" r="4" fill="#64748b"/>
+  <circle cx="400" cy="138" r="4" fill="#64748b"/>
+  <circle cx="80" cy="168" r="4" fill="#eab308"/>
+  <circle cx="400" cy="168" r="4" fill="#eab308"/>
+  <circle cx="80" cy="108" r="4" fill="#ef4444"/>
+  <circle cx="400" cy="198" r="4" fill="#ef4444"/>
+  <circle cx="80" cy="138" r="4" fill="#f97316"/>
+  <circle cx="400" cy="228" r="4" fill="#f97316"/>
+  <circle cx="570" cy="138" r="4" fill="#e2e8f0"/>
+  <circle cx="570" cy="168" r="4" fill="#94a3b8"/>
+
+  <!-- "Verified working" badge on I2S section -->
+  <rect x="280" y="400" width="180" height="28" rx="14" fill="#166534" stroke="#22c55e"/>
+  <text x="370" y="418" text-anchor="middle" font-size="10" fill="#22c55e">I2S confirmed working (stream OK)</text>
+
+</svg>
+</div>
+
+<!-- ===== CHECKLIST SIDEBAR ===== -->
+<div class="sidebar">
+  <div class="checklist">
+    <h2>Wiring Checklist</h2>
+    <p style="font-size:0.75rem; color:#64748b; margin-bottom:12px;">Click to highlight wire. Tick when verified.</p>
+
+    <div class="check-item" data-wire="5v">
+      <input type="checkbox" id="c1">
+      <label for="c1">
+        <div class="check-label"><span class="wire-color" style="background:#ef4444"></span> XIAO 5V → MAX VIN</div>
+        <div class="check-detail">Power. Must be the 5V pin (top-right), NOT 3V3.</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="gnd">
+      <input type="checkbox" id="c2">
+      <label for="c2">
+        <div class="check-label"><span class="wire-color" style="background:#64748b"></span> XIAO GND → MAX GND</div>
+        <div class="check-detail">Common ground. Without this, nothing works.</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="bclk" style="border-left: 3px solid #22c55e; padding-left: 8px;">
+      <input type="checkbox" id="c3" checked>
+      <label for="c3">
+        <div class="check-label"><span class="wire-color" style="background:#eab308"></span> XIAO D2 → MAX BCLK</div>
+        <div class="check-detail">Bit clock. ✅ Confirmed working (stream plays).</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="lrc" style="border-left: 3px solid #22c55e; padding-left: 8px;">
+      <input type="checkbox" id="c4" checked>
+      <label for="c4">
+        <div class="check-label"><span class="wire-color" style="background:#ef4444"></span> XIAO D0 → MAX LRC</div>
+        <div class="check-detail">Word select. ✅ Confirmed working (stream plays).</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="din" style="border-left: 3px solid #22c55e; padding-left: 8px;">
+      <input type="checkbox" id="c5" checked>
+      <label for="c5">
+        <div class="check-label"><span class="wire-color" style="background:#f97316"></span> XIAO D1 → MAX DIN</div>
+        <div class="check-detail">Audio data. ✅ Confirmed working (stream plays).</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="spk_pos">
+      <input type="checkbox" id="c6">
+      <label for="c6">
+        <div class="check-label"><span class="wire-color" style="background:#e2e8f0"></span> MAX OUT+ → Speaker +</div>
+        <div class="check-detail">⚠️ Most likely issue! Check this connection.</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="spk_neg">
+      <input type="checkbox" id="c7">
+      <label for="c7">
+        <div class="check-label"><span class="wire-color" style="background:#94a3b8"></span> MAX OUT- → Speaker -</div>
+        <div class="check-detail">⚠️ Both speaker wires must be connected.</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="vol_up">
+      <input type="checkbox" id="c8">
+      <label for="c8">
+        <div class="check-label"><span class="wire-color" style="background:#22c55e"></span> Vol+ switch → XIAO D4</div>
+        <div class="check-detail">One switch pin to D4 (GPIO5).</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="vol_up_gnd">
+      <input type="checkbox" id="c9">
+      <label for="c9">
+        <div class="check-label"><span class="wire-color" style="background:#64748b"></span> Vol+ switch → GND</div>
+        <div class="check-detail">Other switch pin to GND rail.</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="vol_down">
+      <input type="checkbox" id="c10">
+      <label for="c10">
+        <div class="check-label"><span class="wire-color" style="background:#3b82f6"></span> Vol- switch → XIAO D5</div>
+        <div class="check-detail">One switch pin to D5 (GPIO6).</div>
+      </label>
+    </div>
+
+    <div class="check-item" data-wire="vol_down_gnd">
+      <input type="checkbox" id="c11">
+      <label for="c11">
+        <div class="check-label"><span class="wire-color" style="background:#64748b"></span> Vol- switch → GND</div>
+        <div class="check-detail">Other switch pin to GND rail.</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="progress">
+    <span class="progress-text" id="progress-text">0 / 11 verified</span>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="legend">
+    <h2>Diagnosis</h2>
+    <div class="legend-item">🟢 I2S wiring (D0, D1, D2) is confirmed — stream decodes</div>
+    <div class="legend-item">🔴 No sound → check <strong>OUT+ / OUT-</strong> to speaker</div>
+    <div class="legend-item">🔴 Also check <strong>5V</strong> and <strong>GND</strong> to MAX98357A</div>
+    <div class="legend-item" style="margin-top:8px; color:#eab308;">If MAX has power + speaker connected and still silent:<br>→ Check if SD pin is accidentally grounded (disables amp)</div>
+  </div>
+</div>
+
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<script>
+const wires = document.querySelectorAll('.wire[data-wire]');
+const checkItems = document.querySelectorAll('.check-item[data-wire]');
+const tooltip = document.getElementById('tooltip');
+
+const wireDescriptions = {
+  '5v':           'Red wire: XIAO 5V pin (top-right) → MAX98357A VIN',
+  'gnd':          'Black wire: XIAO GND → MAX98357A GND (shared ground)',
+  'bclk':         'Yellow wire: XIAO D2 (GPIO3) → MAX98357A BCLK (bit clock)',
+  'lrc':          'Red dashed: XIAO D0 (GPIO1) → MAX98357A LRC (word select)',
+  'din':          'Orange wire: XIAO D1 (GPIO2) → MAX98357A DIN (audio data)',
+  'spk_pos':      'White wire: MAX98357A OUT+ → Speaker positive terminal',
+  'spk_neg':      'Gray dashed: MAX98357A OUT- → Speaker negative terminal',
+  'vol_up':       'Green wire: Volume UP switch pin 1 → XIAO D4 (GPIO5)',
+  'vol_up_gnd':   'Gray dashed: Volume UP switch pin 2 → GND',
+  'vol_down':     'Blue wire: Volume DOWN switch pin 1 → XIAO D5 (GPIO6)',
+  'vol_down_gnd': 'Gray dashed: Volume DOWN switch pin 2 → GND',
+};
+
+function highlightWire(wireId) {
+  // Dim all wires, activate the selected one
+  wires.forEach(w => {
+    if (w.dataset.wire === wireId) {
+      w.classList.add('active');
+      w.classList.remove('dimmed');
+    } else {
+      w.classList.add('dimmed');
+      w.classList.remove('active');
+    }
+  });
+  // Highlight matching checklist item
+  checkItems.forEach(item => {
+    if (item.dataset.wire === wireId) {
+      item.classList.add('highlighted');
+    } else {
+      item.classList.remove('highlighted');
+    }
+  });
+}
+
+function clearHighlights() {
+  wires.forEach(w => { w.classList.remove('dimmed', 'active'); });
+  checkItems.forEach(item => { item.classList.remove('highlighted'); });
+}
+
+// Wire click
+wires.forEach(w => {
+  w.addEventListener('click', () => highlightWire(w.dataset.wire));
+  w.addEventListener('mouseenter', (e) => {
+    tooltip.textContent = wireDescriptions[w.dataset.wire] || '';
+    tooltip.style.display = 'block';
+  });
+  w.addEventListener('mousemove', (e) => {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY - 30) + 'px';
+  });
+  w.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+});
+
+// Checklist click highlights wire
+checkItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'INPUT') {
+      highlightWire(item.dataset.wire);
+    }
+  });
+});
+
+// Click background to clear
+document.querySelector('svg').addEventListener('click', (e) => {
+  if (e.target.tagName === 'svg' || e.target.tagName === 'rect' && !e.target.dataset.pin) {
+    clearHighlights();
+  }
+});
+
+// Checkbox progress
+function updateProgress() {
+  const checks = document.querySelectorAll('.check-item input[type="checkbox"]');
+  const checked = [...checks].filter(c => c.checked).length;
+  const total = checks.length;
+  document.getElementById('progress-text').textContent = `${checked} / ${total} verified`;
+  document.getElementById('progress-fill').style.width = `${(checked / total) * 100}%`;
+
+  if (checked === total) {
+    document.getElementById('progress-text').classList.add('all-done');
+    document.getElementById('progress-text').textContent = 'All wires verified!';
+  } else {
+    document.getElementById('progress-text').classList.remove('all-done');
+  }
+
+  // Update checked style
+  checks.forEach(c => {
+    c.closest('.check-item').classList.toggle('checked', c.checked);
+  });
+}
+
+document.querySelectorAll('.check-item input[type="checkbox"]').forEach(c => {
+  c.addEventListener('change', updateProgress);
+});
+
+// Init
+updateProgress();
+</script>
+
+</body>
+</html>
